@@ -36,3 +36,41 @@ resource "azurerm_app_service" "example" {
 
 */
 
+provider "azurerm" {
+  features {}
+  subscription_id = "81697b3e-f6a5-4d7f-8a2b-59a42bb0b8e9"
+  
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
+  location = "West Europe"
+}
+
+resource "azurerm_app_service_plan" "example" {
+  name                = "example-appserviceplan"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+
+  sku {
+    tier = "Free"
+    size = "F1"
+  }
+}
+
+resource "azurerm_app_service" "example" {
+  name                = "example-app-service"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  app_service_plan_id = azurerm_app_service_plan.example.id
+
+  site_config {
+    dotnet_framework_version = "v4.0"
+    scm_type                 = "LocalGit"
+  }
+
+  app_settings = {
+    "SOME_KEY" = "some-value"
+  }
+}
+
